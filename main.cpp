@@ -23,10 +23,6 @@ void participante();
  * @return el arreglo con los puntajes
  */
 vector<int> obtenerPuntajes(std::string linea);
-
-// funcion no utilizada
-// void anadirSeparados(std::vector<int> puntajes, std::vector<int> &vNem, std::vector<int> &vRanking, std::vector<int> &vMatematica, std::vector<int> &vLenguaje, std::vector<int> &vCiencias, std::vector<int> &vHistoria);
-
 void calculos(std::vector<int> &V, long int suma, std::string nombre);
 
 /**
@@ -41,25 +37,14 @@ int main(int argc, char** argv) {
         std::string ruta(argv[1]);
 
         std::ifstream entrada(ruta);
-        std::vector<int> vNem;
-        std::vector<int> vRanking;
-        std::vector<int> vMatematica;
-        std::vector<int> vLenguaje;
-        std::vector<int> vCiencias;
-        std::vector<int> vHistoria;
-        long int sumaNem = 0;
-        long int sumaRanking = 0;
-        long int sumaMatematica = 0;
-        long int sumaLenguaje = 0;
-        long int sumaCiencias = 0;
-        long int sumaHistoria = 0;
+        std::vector<int> vNem, vRanking, vMatematica, vLenguaje, vCiencias, vHistoria;
+        long int sumaNem = 0, sumaRanking = 0, sumaMatematica = 0, sumaLenguaje = 0, sumaCiencias = 0, sumaHistoria = 0;
         
 
         if (entrada) {
             for (std::string linea; getline(entrada, linea);) {
                 vector<int> puntajes = obtenerPuntajes(linea);
                 if (puntajes.size() >= 6) {
-                    // anadirSeparados(puntajes,vNem,vRanking,vMatematica,vLenguaje,vCiencias,vHistoria);
                     int nem = puntajes.at(1);
                     vNem.push_back(nem);
                     int ranking = puntajes.at(2);
@@ -114,29 +99,9 @@ vector<int> obtenerPuntajes(std::string linea) {
     return arreglo;
 }
 
-/* No utilizada
-void anadirSeparados(std::vector<int> puntajes, std::vector<int> &vNem, std::vector<int> &vRanking, std::vector<int> &vMatematica, std::vector<int> &vLenguaje, std::vector<int> &vCiencias, std::vector<int> &vHistoria) {
-    int nem = puntajes.at(1);
-    vNem.push_back(nem);
-    int ranking = puntajes.at(2);
-    vRanking.push_back(ranking);
-    int matematica = puntajes.at(3);
-    vMatematica.push_back(matematica);
-    int lenguaje = puntajes.at(4);
-    vLenguaje.push_back(lenguaje);
-    int ciencias = puntajes.at(5);
-    vCiencias.push_back(ciencias);
-    int historia = puntajes.at(6);
-    vHistoria.push_back(historia);
-} */
-
 void calculos(std::vector<int> &V, long int suma, std::string nombre){
     sort(V.begin(), V.end());
-    int largo = V.size();/* 
-    long int suma = 0;
-    for(int i = 0; i < largo ; i++){
-        suma += V.at(i);
-    } */
+    int largo = V.size();
     float avg = (float)(suma)/(float)(largo);
     float mediana;
     int aux = largo/2;
@@ -147,18 +112,16 @@ void calculos(std::vector<int> &V, long int suma, std::string nombre){
         mediana = V.at(aux);
     }
     double sumaCuadrados = 0;
+    unsigned maximoActual = 0;
+    unsigned moda = 0;
     map<int,int> contadores;
     for (int it = 0; it < largo ; it++){
         ++contadores[V.at(it)];
         double resta = V.at(it) - avg;
         sumaCuadrados += resta*resta;
-    }
-    unsigned maximoActual = 0;
-    unsigned moda = 0;
-    for(auto it = contadores.cbegin(); it != contadores.cend();++it){
-        if (it ->second > maximoActual){
-            moda = it->first;
-            maximoActual = it->second;
+        if(contadores[V.at(it)]>maximoActual){
+            moda = V.at(it);
+            maximoActual = contadores[V.at(it)];
         }
     }
     float stdev = sqrt(sumaCuadrados/largo);

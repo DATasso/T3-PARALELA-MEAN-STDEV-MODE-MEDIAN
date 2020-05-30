@@ -8,6 +8,7 @@
 #include <map>
 #include <cmath>
 #include <algorithm>
+#include <omp.h>
 
 
 using namespace std;
@@ -27,7 +28,7 @@ vector<int> obtenerPuntajes(std::string linea);
 // funcion no utilizada
 // void anadirSeparados(std::vector<int> puntajes, std::vector<int> &vNem, std::vector<int> &vRanking, std::vector<int> &vMatematica, std::vector<int> &vLenguaje, std::vector<int> &vCiencias, std::vector<int> &vHistoria);
 
-void calculos(std::vector<int> &V, long int suma, std::string nombre);
+void calculos(std::vector<int> &V, long long suma, std::string nombre);
 
 /**
  * Taller computacional
@@ -41,25 +42,38 @@ int main(int argc, char** argv) {
         std::string ruta(argv[1]);
 
         std::ifstream entrada(ruta);
-        std::vector<int> vNem;
-        std::vector<int> vRanking;
-        std::vector<int> vMatematica;
-        std::vector<int> vLenguaje;
-        std::vector<int> vCiencias;
-        std::vector<int> vHistoria;
-        long int sumaNem = 0;
-        long int sumaRanking = 0;
-        long int sumaMatematica = 0;
-        long int sumaLenguaje = 0;
-        long int sumaCiencias = 0;
-        long int sumaHistoria = 0;
+        /**
+         * 0 = Nem
+         * 1 = Ranking
+         * 2 = Matematica
+         * 3 = Lenguaje
+         * 4 = Ciencias
+         * 5 = Historia
+         */
+        std::vector<int> vectores[6];
+        long long sumas[] = {0, 0, 0, 0, 0, 0};
+        int valores[6];
+        std::string strings[] = {"Nem", "Ranking", "Matematica", "Lenguaje", "Ciencias", "Historia"};
         
 
         if (entrada) {
+
+        #pragma omp parallel
+            {
+        #pragma omp single
             for (std::string linea; getline(entrada, linea);) {
+        #pragma omp task
+            {
                 vector<int> puntajes = obtenerPuntajes(linea);
                 if (puntajes.size() >= 6) {
                     // anadirSeparados(puntajes,vNem,vRanking,vMatematica,vLenguaje,vCiencias,vHistoria);
+                    #pragma omp parallel for
+                    for(int i = 0; i < 6; i++) {
+                        valores[i] = puntajes.at(i+1);
+                        vectores[i].push_back(valores[i]);
+                        sumas[i] += valores[i];
+                    }
+                    /*
                     int nem = puntajes.at(1);
                     vNem.push_back(nem);
                     int ranking = puntajes.at(2);
@@ -77,19 +91,21 @@ int main(int argc, char** argv) {
                     sumaMatematica += matematica;
                     sumaLenguaje += lenguaje;
                     sumaCiencias += ciencias;
-                    sumaHistoria += historia;
+                    sumaHistoria += historia;*/
                     }
                 puntajes.clear();
             }
-            calculos(vNem, sumaNem, "Nem");
-            calculos(vRanking, sumaRanking, "Ranking");
-            calculos(vMatematica, sumaMatematica, "Matemática");
-            calculos(vLenguaje, sumaLenguaje, "Lenguaje");
-            calculos(vCiencias, sumaCiencias, "Ciencias");
-            calculos(vHistoria, sumaHistoria, "Historia");
+            }
+        }
+            #pragma omp parallel for
+            for(int i = 0; i < 6; i++) {
+                calculos(vectores[i], sumas[i], strings[i]);
+            }
             participante();
         }
         else {
+            // Tirrar un error
+            std::cout << "Error, no se pudo abrir el archivo" << std::endl;
         participante();
         }
     }
@@ -130,7 +146,7 @@ void anadirSeparados(std::vector<int> puntajes, std::vector<int> &vNem, std::vec
     vHistoria.push_back(historia);
 } */
 
-void calculos(std::vector<int> &V, long int suma, std::string nombre){
+void calculos(std::vector<int> &V, long long suma, std::string nombre){
     sort(V.begin(), V.end());
     int largo = V.size();/* 
     long int suma = 0;
@@ -162,5 +178,6 @@ void calculos(std::vector<int> &V, long int suma, std::string nombre){
         }
     }
     float stdev = sqrt(sumaCuadrados/largo);
-    cout << "===" << nombre << "===" << std::endl << "Promedio: " << avg << std::endl << "Desviación Estándar: " << stdev << std::endl << "Moda: " << moda << std::endl << "Mediana: " << mediana << std::endl;
+    #pragma omp critical
+    std::cout << "===" << nombre << "===" << std::endl << "Promedio: " << avg << std::endl << "Desviación Estándar: " << stdev << std::endl << "Moda: " << moda << std::endl << "Mediana: " << mediana << std::endl;
 }

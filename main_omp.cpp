@@ -66,33 +66,13 @@ int main(int argc, char** argv) {
             {
                 vector<int> puntajes = obtenerPuntajes(linea);
                 if (puntajes.size() >= 6) {
-                    // anadirSeparados(puntajes,vNem,vRanking,vMatematica,vLenguaje,vCiencias,vHistoria);
                     #pragma omp parallel for
                     for(int i = 0; i < 6; i++) {
                         valores[i] = puntajes.at(i+1);
                         vectores[i].push_back(valores[i]);
                         sumas[i] += valores[i];
                     }
-                    /*
-                    int nem = puntajes.at(1);
-                    vNem.push_back(nem);
-                    int ranking = puntajes.at(2);
-                    vRanking.push_back(ranking);
-                    int matematica = puntajes.at(3);
-                    vMatematica.push_back(matematica);
-                    int lenguaje = puntajes.at(4);
-                    vLenguaje.push_back(lenguaje);
-                    int ciencias = puntajes.at(5);
-                    vCiencias.push_back(ciencias);
-                    int historia = puntajes.at(6);
-                    vHistoria.push_back(historia);
-                    sumaNem += nem;
-                    sumaRanking += ranking;
-                    sumaMatematica += matematica;
-                    sumaLenguaje += lenguaje;
-                    sumaCiencias += ciencias;
-                    sumaHistoria += historia;*/
-                    }
+                }
                 puntajes.clear();
             }
             }

@@ -3,11 +3,11 @@
 #include <fstream>
 #include <vector>
 #include <cstdlib>
-#include "omp.h"
 #include <map>
 #include <cmath>
 #include <algorithm>
 #include <omp.h>
+#include "mpi/mpi.h"
 
 
 using namespace std;
@@ -36,17 +36,16 @@ void calculos(std::vector<int> &V, long long suma, std::string nombre);
  * @return El código de salida del programa
  */
 
-
 int main(int argc, char** argv) {
     int mi_rango;
     int procesadores;
     int master = 0;
     int tag = 0;
-    MPI_status estado;
+    MPI_Status estado;
 
     if (argc > 1) {
 
-        MPI_INIT(&argc, &argv);
+        MPI_Init(&argc, &argv);
         MPI_Comm_rank(MPI_COMM_WORLD, &mi_rango);
         MPI_Comm_size(MPI_COMM_WORLD, &procesadores);
         if(procesadores < 2) {
@@ -75,14 +74,14 @@ int main(int argc, char** argv) {
 
             if (entrada) {
                 for (std::string linea; getline(entrada, linea);) {
-                    MPI_Send(linea.c_str(), lectura.length() +1, MPI_CHAR, procesador, tag, MPI_COMM_WORLD);
+                    MPI_Send(linea.c_str(), linea.length() +1, MPI_CHAR, procesador, tag, MPI_COMM_WORLD);
 
                     procesador += 1;
                     if (procesador >= procesadores) {
                         procesador = 2;
                     }
                 }
-                MPI_Send("STOP", 5, MPI_CHAR, procesador, tag, MPI_COMM_WORLD)
+                MPI_Send("STOP", 5, MPI_CHAR, procesador, tag, MPI_COMM_WORLD);
                 entrada.close();
             }
             else {
@@ -112,13 +111,13 @@ int main(int argc, char** argv) {
                 }
             }
         }
-    }
     MPI_Finalize();
     
   /// MOVER AL FINAL
-    #pragma omp parallel for
-    for(int i = 0; i < 6; i++) {
-        calculos(vectores[i], sumas[i], strings[i]);
+        #pragma omp parallel for
+        for(int i = 0; i < 6; i++) {
+            calculos(vectores[i], sumas[i], strings[i]);
+        }
     }
     participante();
 

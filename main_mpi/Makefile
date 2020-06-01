@@ -7,11 +7,11 @@ LIBS = -lm -lmpi
 directorios:
 	$(MKDIR) build dist
 
-main.o: directorios main.cpp
-	$(CXX) $(CXXFLAGS) -c main.cpp -o build/main.o
+main_mpi.o: directorios main_mpi.cpp
+	$(CXX) $(CXXFLAGS) -c main_mpi.cpp -o build/main_mpi.o
 
-all: clean main.o
-	$(CXX) $(CXXFLAGS) -o dist/promediador-mpi build/main.o  $(LIBS) 
+all: clean main_mpi.o
+	$(CXX) $(CXXFLAGS) -o dist/promediador-mpi build/main_mpi.o  $(LIBS) 
 	rm -fr build
 
 clean:

@@ -15,7 +15,7 @@ pub install
 Para C++ Secuencial:
 ```
 g++ main.cpp
-g++ main_omp.cpp -lpqxx -lpq
+g++ main_omp.cpp -fopenmp
 ```
 ### Ejecución
 - C++ Windows

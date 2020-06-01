@@ -143,7 +143,6 @@ void calculos(std::vector<int> &V, long long suma, std::string nombre){
         mediana = V.at(aux);
     }
     double sumaCuadrados = 0;
-    double sumaCuadrados = 0;
     unsigned maximoActual = 0;
     unsigned moda = 0;
     map<int,int> contadores;

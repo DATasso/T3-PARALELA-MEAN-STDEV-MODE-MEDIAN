@@ -71,6 +71,11 @@ int main(int argc, char** argv) {
             fprintf(stderr, "\nLa implementación requiere al menos 3 procesadores\n");
             return EXIT_FAILURE;
         }
+        bool procesados[procesadores];
+        for (int i = 0; i < procesadores; i++) {
+            procesados[i] = true;
+        }
+        procesados[0] = false;
 
 
         if (mi_rango == 0) {
@@ -111,11 +116,6 @@ int main(int argc, char** argv) {
             }
         } else {
             /* Obtengo el mensajes */
-            bool procesados[procesadores];
-            for (int i = 0; i < procesadores; i++) {
-                procesados[i] = true;
-            }
-            procesados[0] = false;
             while (true) {
                 char* mensaje = (char *) calloc(LARGO, sizeof (char));
                 MPI_Recv(mensaje, LARGO, MPI_CHAR, maestro, tag, MPI_COMM_WORLD, &estado);
@@ -149,16 +149,20 @@ int main(int argc, char** argv) {
                 }
                 free(mensaje);
             }
-            if (!isAnyOk(procesados, procesadores)){
-                calculos(vNem, sumaNem, "Nem");
-                calculos(vRanking, sumaRanking, "Ranking");
-                calculos(vMatematica, sumaMatematica, "Matemática");
-                calculos(vLenguaje, sumaLenguaje, "Lenguaje");
-                calculos(vCiencias, sumaCiencias, "Ciencias");
-                calculos(vHistoria, sumaHistoria, "Historia");
-                participante();
+            if(mi_rango==1){
+                while(true){
+                    if (!isAnyOk(procesados, procesadores)){
+                        calculos(vNem, sumaNem, "Nem");
+                        calculos(vRanking, sumaRanking, "Ranking");
+                        calculos(vMatematica, sumaMatematica, "Matemática");
+                        calculos(vLenguaje, sumaLenguaje, "Lenguaje");
+                        calculos(vCiencias, sumaCiencias, "Ciencias");
+                        calculos(vHistoria, sumaHistoria, "Historia");
+                        participante();
+                        break;
+                    }
+                }
             }
-
         }
 
         /* Termina con MPI. Recordemos que después de 

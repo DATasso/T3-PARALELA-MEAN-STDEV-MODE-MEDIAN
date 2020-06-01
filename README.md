@@ -25,9 +25,10 @@ g++ main_omp.cpp -lpqxx -lpq
 - Dart
     `dart calculos.dart rutaArchivo.csv`
 - C++ MPI Linux (dentro de la carpeta main_mpi)
-    `make`
-    `./run.sh` o `./dist/programa-mpi`
-
+```
+make
+./dist/programa-mpi`
+```
 #### Autores
 - Daniel Aguilera Tasso
 - Nicolás Andrews Sandoval
